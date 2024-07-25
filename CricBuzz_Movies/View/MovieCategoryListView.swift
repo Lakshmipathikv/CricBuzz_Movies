@@ -16,28 +16,31 @@ struct MovieCategoryListView: View {
             VStack {
                 SearchBar(text: $searchText)
                     .padding(.top)
-                List(viewModel.movieMenuItems, children: \.subItems) { item in
-                    if item.subItems != nil {
-                        HStack {
-                            Text(item.name)
-                                .font(.system(.title2, design: .rounded))
-                                .bold()
-                        }
-                    } else {
-                        NavigationLink(destination: MovieListView(viewModel: MovieListViewModel(selectedMenuItem: item))) {
+                if searchText.isEmpty {
+                    List(viewModel.movieMenuItems, children: \.subItems) { item in
+                        if item.subItems != nil {
                             HStack {
                                 Text(item.name)
-                                    .font(.system(item.parentItemName == nil ? .title2 : .title3, design: .rounded))
+                                    .font(.system(.title2, design: .rounded))
                                     .bold()
+                            }
+                        } else {
+                            NavigationLink(destination: MovieListView(viewModel: MovieListViewModel(selectedMenuItem: item))) {
+                                HStack {
+                                    Text(item.name)
+                                        .font(.system(item.parentItemName == nil ? .title2 : .title3, design: .rounded))
+                                        .bold()
+                                }
                             }
                         }
                     }
+                } else {
+                    MovieListComponent(movieList: viewModel.filteredSearchBarItems(searchText: searchText))
                 }
-                .listStyle(PlainListStyle())
+            }.listStyle(PlainListStyle())
                 .onAppear {
                     viewModel.loadMovieCategoryList()
                 }
-            }
         }
     }
 }
